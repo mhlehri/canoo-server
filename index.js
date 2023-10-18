@@ -23,6 +23,14 @@ async function run() {
   try {
     await client.connect();
 
+    app.get("/cars/:brand", async (req, res) => {
+      const brand = req.params.brand;
+      const query = { brand: brand };
+      const pro = productsCollection.find(query);
+      const result = await pro.toArray();
+      console.log(result);
+      res.send(result);
+    });
     app.post("/addProducts", async (req, res) => {
       const product = req.body;
       console.log(product);
