@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -18,7 +18,7 @@ const client = new MongoClient(uri, {
   },
 });
 const productsCollection = client.db("ProductsDB").collection("products");
-const CartCollection = client.db("CartsDB").collection("carts");
+const cartCollection = client.db("ProductsDB").collection("carts");
 
 async function run() {
   try {
@@ -29,7 +29,6 @@ async function run() {
       const query = { brand: brand };
       const pro = productsCollection.find(query);
       const result = await pro.toArray();
-      console.log(result);
       res.send(result);
     });
 
@@ -40,20 +39,30 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/cars-info", async (req, res) => {
+      const pro = cartCollection.find();
+      const result = await pro.toArray();
+      res.send(result);
+    });
+
     app.post("/cars-info/add", async (req, res) => {
       const car = req.body;
-      const result = await CartCollection.insertOne(car);
+      const result = await cartCollection.insertOne(car);
       res.send(result);
     });
 
     app.post("/addProducts", async (req, res) => {
       const product = req.body;
-      console.log(product);
       const result = await productsCollection.insertOne(product);
       res.send(result);
     });
+    app.delete("/remove/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
   } finally {
-    console.log("onk");
   }
 }
 run().catch(console.dir);
