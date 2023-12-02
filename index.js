@@ -38,13 +38,9 @@ const verifyToken = (req, res, next) => {
 };
 async function run() {
   try {
-    app.get("/cars", async (req, res) => {
-      const brand = req.query.brand;
-      console.log(brand);
-      const query = {
-        $or: [{ brand: brand }, { name: { $regex: brand, $options: "i" } }],
-      };
-      const pro = productsCollection.find(query);
+    app.get("/cars/:brand", async (req, res) => {
+      const brand = req.params.brand;
+      const pro = productsCollection.find({ brand });
       const result = await pro.toArray();
       console.log(result);
       res.send(result);
